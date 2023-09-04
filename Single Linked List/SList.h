@@ -4,46 +4,36 @@
 #include <stdlib.h>
 #include <assert.h>
 
-//创建节点结构体（数据域，指针域）
-typedef int SLDataType;
-typedef struct SLNode
+/* 无头单向非循环链表 */
+typedef int SLTDateType;		//数据类型重定义
+typedef struct SListNode		//单链表结点结构体定义
 {
-	SLDataType data;
-	struct SLNode* next;
-}SLNode;
+	SLTDateType data;
+	struct SListNode* next;
+}SListNode;
+
 
 // 动态申请一个节点
-SLNode* BuySListNode(SLDataType x);
-
+SListNode* BuySListNode(SLTDateType x);
 // 单链表打印
-void SLPrint(SLNode* plist);
-
+void SListPrint(SListNode* plist);
 // 单链表尾插
-void SLPushBack(SLNode** pplist, SLDataType x);
-
+void SListPushBack(SListNode** pplist, SLTDateType x);
 // 单链表的头插
-void SLPushFront(SLNode** pplist, SLDataType x);
-
+void SListPushFront(SListNode** pplist, SLTDateType x);
 // 单链表的尾删
-void SLPopBack(SLNode** pplist);
-
+void SListPopBack(SListNode** pplist);
 // 单链表头删
-void SLPopFront(SLNode** pplist);
-
+void SListPopFront(SListNode** pplist);
 // 单链表查找
-SLNode* SLFind(SLNode* plist, SLDataType x);
-
-// 单链表在pos位置之前插入x
-void SLInsert(SLNode** pplist, SLNode* pos, SLDataType x);
-
+SListNode* SListFind(SListNode* plist, SLTDateType x);
+// 单链表修改
+void SListModify(SListNode* pos, SLTDateType x);
 // 单链表在pos位置之后插入x
-void SLInsertAfter(SLNode* pos, SLDataType x);
-
-// 单链表删除pos位置的值
-void SLErase(SLNode** pplist, SLNode* pos);
-
+// 分析思考为什么不在pos位置之前插入？
+void SListInsertAfter(SListNode* pos, SLTDateType x);
 // 单链表删除pos位置之后的值
-void SLEraseAfter(SLNode* pos);
-
-//清空链表
-void SLDestory(SLNode** pplist);
+// 分析思考为什么不删除pos位置？
+void SListEraseAfter(SListNode* pos);
+// 单链表的销毁
+void SListDestroy(SListNode* plist);

@@ -1,165 +1,112 @@
 #include "SList.h"
 
 
-void test1()
+void TestPush()
 {
-	SLNode* head = NULL;
-	int num = 0;
-	//尾插
-	SLPushBack(&head, 1);
-	SLPushBack(&head, 2);
-	SLPushBack(&head, 3);
-	SLPrint(head);
-	//头插
-	//SLPushFront(&head, 1);
-	//SLPushFront(&head, 2);
-	//SLPushFront(&head, 3);
-	//SLPrint(head);
+	SListNode* plist = NULL;		//1. 无哨兵位头结点不需初始化，直接进行尾插
+	
+	SListPrint(plist);				//测试点3：空表打印
 
+	SListPushBack(&plist, 1);		//测试点1：尾插第一个结点
+	SListPrint(plist);
+
+	SListPushBack(&plist, 2);		//测试点2：非空表尾插
+	SListPushBack(&plist, 3);
+	SListPushBack(&plist, 4);
+	SListPrint(plist);
+
+	SListPushFront(&plist, 3);		//测试点4：头插
+	SListPushFront(&plist, 4);
+	SListPrint(plist);
 }
 
-void test2()
+void TestPop()
 {
-	SLNode* head = NULL;
-	int num = 0;
-	//尾插
-	SLPushBack(&head, 1);
-	SLPushBack(&head, 2);
-	SLPushBack(&head, 3);
-	SLPrint(head);
-	//头插
-	SLPushFront(&head, 1);
-	SLPushFront(&head, 2);
-	SLPushFront(&head, 3);
-	SLPrint(head);
+	SListNode* plist = NULL;
+	SListPushFront(&plist, 1);
+	SListPushFront(&plist, 2);
+	SListPushFront(&plist, 3);
+	SListPushFront(&plist, 4);
+	SListPrint(plist);
 
-	SLPopBack(&head);
-	SLPopBack(&head);
-	SLPopBack(&head);
-	SLPrint(head);
+	//SListPopBack(&plist);			//测试点1：结点数大于1的尾删
+	//SListPopBack(&plist);
+	//SListPopBack(&plist);
+	//SListPrint(plist);
 
-	SLPopFront(&head);
-	SLPopFront(&head);
-	SLPopFront(&head);
-	SLPrint(head);
+	//SListPopBack(&plist);			//测试点2：结点数等于1的尾删
+	//SListPrint(plist);
+	//
+	//SListPopBack(&plist);			//测试点3：空表尾删（断言成功！）
+	//Assertion failed: pplist && *pplist, file D:\git_work\Data-structure\Single Linked List\SList.c, line 358
 
+	SListPopFront(&plist);			//测试点4：非空表头删
+	SListPopFront(&plist);
+	SListPopFront(&plist);
+	SListPrint(plist);
+	SListPopFront(&plist);
+	SListPrint(plist);
+
+	SListPopFront(&plist);			//测试点5：空表头删（断言成功！）
+	//Assertion failed: pplist && *pplist, file D:\git_work\Data-structure\Single Linked List\SList.c, line 388
 }
 
-void test3()
+void TestFind()
 {
-	SLNode* head = NULL;
-	//头插
-	SLPushFront(&head, 1);
-	SLPushFront(&head, 2);
-	SLPushFront(&head, 3);
-	SLPushFront(&head, 3);
-	SLPushFront(&head, 3);
-	SLPushFront(&head, 3);
-	SLPrint(head);
+	SListNode* plist = NULL;
 
-	SLNode* ret = SLFind(head, 3);
-	if (!ret)
+	//SListFind(plist, 1);			//测试点1：空表查找（断言成功！）
+	//Assertion failed: plist, file D:\git_work\Data-structure\Single Linked List\SList.c, line 404
+
+	SListPushFront(&plist, 1);
+	SListPushFront(&plist, 2);
+	SListPushFront(&plist, 3);
+	SListPushFront(&plist, 4);
+	SListPrint(plist);
+
+	SListNode* pos = SListFind(plist, 2);//测试点2：找不到——返回NULL
+	if (!pos)
 	{
-		printf("没找到\n");
+		printf("找不到\n");
 	}
 	else
 	{
-		int i = 1;
-		printf("找到了\n");
-		while (ret)
-		{
-			printf("第%d个ret节点：%p->%d\n", i++, ret, ret->data);
-			ret = SLFind(ret->next, 3);
-		}
+		printf("找到了，地址是%p\n", pos);//测试点3：找到——返回该节点的地址
+		SListModify(pos, 20);			 //测试点4：查找延申的修改功能
+		SListPrint(plist);
 
 	}
-	//如果出现多个相同值如何查找？
-	//找到第一个返回节点的地址，循环从下一个位置开始找
 }
 
-void test4()
+void TestInsertAndErase()
 {
-	//查找功能可以延伸出一个修改功能
-	SLNode* head = NULL;
-	//头插
-	SLPushFront(&head, 1);
-	SLPushFront(&head, 2);
-	SLPushFront(&head, 3);
-	SLPushFront(&head, 3);
-	SLPushFront(&head, 3);
-	SLPushFront(&head, 3);
-	SLPrint(head);
+	SListNode* plist = NULL;
 
-	SLNode* ret = SLFind(head, 3);
-	if (ret)
-	{
-		ret->data = 30;
-	}
-	SLPrint(head);
-	//如果想把链表中所有的3都改成30的话就从下一个节点开始找，找到就修改
-}
+	SListPushFront(&plist, 1);
+	SListPushFront(&plist, 2);
+	SListPushFront(&plist, 3);
+	SListPushFront(&plist, 4);
+	SListPrint(plist);
 
-void test5()
-{
-	//查找功能可以延伸出一个修改功能
-	SLNode* head = NULL;
-	//头插
-	SLPushFront(&head, 1);
-	SLPushFront(&head, 2);
-	SLPushFront(&head, 3);
-	SLPushFront(&head, 4);
-	SLPrint(head);
-	
-	SLNode* ret = SLFind(head, 4);
-	//SLInsert(&head, ret, 30);
-	if (ret)
-	{
-		SLInsert(&head, ret, 30);
-	}
-	SLPrint(head);
-	//达到类似头插入的效果
-	//复用一下头插就完了
-	//改好了，不能照抄，头节点前已经没有节点了，会死循环
-}
+	SListInsertAfter(SListFind(plist, 4), 40);	//测试点1：第一个结点之后插入
+	SListPrint(plist);
 
-void test6()
-{
-	SLNode* head = NULL;
-	//头插
-	SLPushFront(&head, 1);
-	SLPushFront(&head, 2);
-	SLPushFront(&head, 3);
-	SLPrint(head);
-	
-	SLNode* ret = SLFind(head, 3);
-	SLErase(&head, ret);
-	SLPrint(head);
+	SListInsertAfter(SListFind(plist, 1), 10);	//测试点2：尾插
+	SListPrint(plist);
 
-}
+	SListEraseAfter(SListFind(plist, 2));		//测试点3：删除一个结点
+	SListPrint(plist);
+	SListEraseAfter(SListFind(plist, 3));		//测试点4：删除不存在的结点，不好用，应该做到删除指定结点，单向链表不好实现
+	SListPrint(plist);
 
-void test7()
-{
-	SLNode* head = NULL;
-	//头插
-	SLPushFront(&head, 1);
-	SLPushFront(&head, 2);
-	SLPushFront(&head, 3);
-	SLPrint(head);
-
-	SLDestory(&head);
-	SLPrint(head);
-
+	SListDestroy(plist);
 }
 
 int main(void)
 {
-	//test1();
-	//test2();
-	//test3();
-	//test4();
-	//test5();
-	//test6();
-	test7();
-
+	//TestPush();
+	//TestPop();
+	//TestFind();
+	//TestInsertAndErase();
 	return 0;
 }

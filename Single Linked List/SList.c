@@ -1,136 +1,96 @@
 #include "SList.h"
 
-// 单链表打印
-void SLPrint(SLNode* plist)
+
+// 动态申请一个节点
+static SListNode* BuySListNode(SLTDateType x)
 {
-	//空链表也要打印，不用断言
-
-	//在不为空指针之前
-	while (plist)
+	/*
+	* 为新结点开辟空间，判断是否开辟成功，是则继续，否则异常退出程序
+	*/
+	SListNode* newnode = (SListNode*)malloc(sizeof(SListNode));
+	if (newnode == NULL)
 	{
-		printf("%d->", plist->data);
-		plist = plist->next;
-	}
-	//最后提示空指针并且换行
-	printf("NULL\n");
-}
-//不需要改动链表，因此不需要二级指针
-
-
-
-// 单链表尾插
-//一、遍历链表直到最后一个节点，尾节点链接新节点（这里）
-//二、通过维护一个尾指针，直接用尾指针链接新节点——以后再改吧，现在不研究了（3.21）
-
-void SLPushBack(SLNode** pphead, SLDataType x)
-{
-	assert(pphead);//头指针的地址不能为空要断言
-
-	//一上来就先建一个新的节点，用来存放传进来的参数
-	if (!(*pphead))
-	{
-		//头指针为空
-		*pphead = BuySListNode(x);
-	}
-	else
-	{
-		SLNode* newnode = BuySListNode(x);
-		//找到链表的尾节点，把newnode变成新的尾节点
-		SLNode* tail = *pphead;
-		while (tail->next)
-		{
-			tail = tail->next;
-		}
-		tail->next = newnode;
-	}
-}
-
-
-//在头插为空或者尾插为空是都要建立一个新的节点，干脆把这部分归并为一个函数，简便代码
-// 申请一个节点
-SLNode* BuySListNode(SLDataType x)
-{
-	SLNode* newnode = (SLNode*)malloc(sizeof(SLNode));
-	if (!(newnode))
-	{
+		printf("malloc newnode failed!\n");
 		exit(-1);
 	}
 	newnode->data = x;
 	newnode->next = NULL;
-	
+
 	return newnode;
 }
 
 
-
-// 单链表的头插
-void SLPushFront(SLNode** pphead, SLDataType x)
+// 单链表打印
+void SListPrint(SListNode* plist)
 {
-	assert(pphead);//头指针的地址不能为空要断言
-
-	if (!(*pphead))
+	SListNode* cur = plist;
+	while (cur)
 	{
-		//头指针为空
-		*pphead = BuySListNode(x);
+		printf("%d->", cur->data);
+		cur = cur->next;
+	}
+	printf("NULL\n");
+}
+
+
+// 单链表尾插
+void SListPushBack(SListNode** pplist, SLTDateType x)
+{
+	/*
+	* 尾插涉及两种情况：1. 空表，即(*pplist == NULL)，需要传入二级指针；2. 非空表，需要找到尾结点 
+	*/
+	assert(pplist);
+
+	if (!(*pplist))
+	{
+		*pplist = BuySListNode(x);
 	}
 	else
 	{
-		//头指针不为空
-		SLNode* newnode = BuySListNode(x);
-		
-		//头插
-		newnode->next = *pphead;
-		*pphead = newnode;
+		SListNode* tail = *pplist;
+		//找尾
+		while (tail->next)
+		{
+			tail = tail->next;
+		}
+		tail->next = BuySListNode(x);
 	}
 }
-//如果为空就建一个新节点给它
-//tmp = newnode;仅仅只是一份拷贝来的，把变量newnode储存的地址给tmp的话，出了函数就会销毁，
 
+
+// 单链表的头插
+void SListPushFront(SListNode** pplist, SLTDateType x)
+{
+	/*
+	* 单链表头插传二级指针，涉及知识点：函数传参的传值与传址之间的区别：
+	* 传值：实参 phead 为指向第一个结点的指针，如果形参为一级指针，则形参 plist 也为指向第一个结点的指针变量
+	* 1. 形参只是实参的一份拷贝，改变形参链接关系无法影响phead。2. 且会在函数结束后由于局部变量被操作系统回收导致新开辟结点丢失的内存泄露问题
+	* 传址：实参 &phead为指向头指针的指针，形参为二级指针pplist，解引用后可以改变phead的链接关系
+	*/
+	assert(pplist);
+
+	SListNode* newnode = BuySListNode(x);
+	newnode->next = (*pplist);
+	*pplist = newnode;
+}
 
 
 // 单链表的尾删
-
-void SLPopBack(SLNode** pphead)
+void SListPopBack(SListNode** pplist)
 {
-	//头指针不能为空，为空就没有内容可以删
-	assert(*pphead);
-	
-	SLNode* tail = *pphead;
-	SLNode* prev = NULL;//指向tail的前一个节点
-	
-	//链表长度 = 1
-	if (tail->next == NULL)
-	{
-		free(tail);
-		*pphead = NULL;
-	}
-	else
-	{//链表长度 > 1
-		while (tail->next)
-		{
-			prev = tail;
-			tail = tail->next;
-		}
-		free(tail);
-		tail = NULL;
-		prev->next = NULL;
-	}
-}
+	/*
+	* 尾删涉及三种情况：1. 空表删除；2. 只有一个结点的删除；3. 结点数大于1的删除
+	*/
+	assert(pplist && *pplist);
 
-void SLPopBack1(SLNode** pphead)
-{
-	//头指针不能为空，为空就没有内容可以删
-	assert(*pphead);
-
-	SLNode* tail = *pphead;
-	//只剩一个节点了
-	if (tail->next == NULL)
+	if (!(*pplist)->next)
 	{
-		free(tail);
-		*pphead = NULL;
+		free(*pplist);
+		*pplist = NULL;
 	}
 	else
 	{
+		SListNode* tail = *pplist;
 		while (tail->next->next)
 		{
 			tail = tail->next;
@@ -141,138 +101,95 @@ void SLPopBack1(SLNode** pphead)
 }
 
 
-
-// 单链表头删 
-
-void SLPopFront(SLNode** pphead)
+// 单链表头删
+void SListPopFront(SListNode** pplist)
 {
-	assert(pphead);//头指针的地址不能为空要断言
-	assert(*pphead);//头指针不能为空，为空就没有内容可以删
+	/*
+	* 头删涉及两种情况：1. 空表删除；2. 非空表删除
+	*/
+	assert(pplist && *pplist);
 
-	SLNode* tmp = *pphead;
-
-	*pphead = (*pphead)->next;
-	free(tmp);
-	tmp = NULL;
+	SListNode* temp = *pplist;
+	*pplist = (*pplist)->next;
+	
+	free(temp);
 }
-
-//函数要改变头指针，就要传头指针的地址，函数参数用二级指针接收
-//	head = head->next;只是改掉了头指针的拷贝，head出了函数就会被销毁
-
 
 
 // 单链表查找
-
-SLNode* SLFind(SLNode* pphead, SLDataType x)
+SListNode* SListFind(SListNode* plist, SLTDateType x)
 {
-	while (pphead)
+	/*
+	* 查找的注意点有三：1. 空表查找；2. 找到——返回该结点指针；3. 找不到——返回NULL。
+	* 注：查找不需要改动结点内容，因此不需要传二级指针
+	*/
+	assert(plist);
+
+	SListNode* dest = plist;
+	while (dest)
 	{
-		if (pphead->data == x)
-		{
-			return pphead;
-		}
-		else
-		{
-			pphead = pphead->next;
-		}
+		if (dest->data == x)
+			return dest;
+		
+		dest = dest->next;
 	}
-	return NULL;
+	return dest;
 }
 
-//plist->next作为循环条件意思就是跳过第一个节点，然而当个只有一个时，会出现有但返回NULL的情况，因此要从头指针开开始
-//查找也是不用传二级指针的，因为不用改动
-//找到了就返回该节点的地址,找不到就返回NULL
 
-
-
-// 单链表在pos位置之前插入x
-// pos来自于Find 
-void SLInsert(SLNode** pphead, SLNode* pos, SLDataType x)
+// 单链表修改
+void SListModify(SListNode* pos, SLTDateType x)
 {
-	assert(pphead);//头指针的地址不能为空要断言
+	/*
+	* 修改结点的内容，需要给函数传入该结点的地址
+	*/
+	assert(pos);
 
-	SLNode* cur = *pphead;
-	SLNode* newnode = BuySListNode(x);
-	if ((*pphead)->data == pos->data)
-	{
-		//头插
-		newnode->next = (*pphead);
-		*pphead = newnode;
-	}
-	else
-	{
-		while (cur->next != pos)
-		{
-			cur = cur->next;
-		}
-
-		cur->next = newnode;
-		newnode->next = pos;
-	}
+	pos->data = x;
 }
-//涉及头插问题，所以要传二级指针
-
 
 
 // 单链表在pos位置之后插入x
-void SLInsertAfter(SLNode* pos, SLDataType x)
+// 分析思考为什么不在pos位置之前插入？
+void SListInsertAfter(SListNode* pos, SLTDateType x)
 {
+	/*
+	* pos位置之后插入只有有一种情况。
+	* 在pos前插入：涉及头插，参数+1，二级指针
+	*/
 	assert(pos);
-	SLNode* newnode = BuySListNode(x);
+
+	SListNode* newnode = BuySListNode(x);
 	newnode->next = pos->next;
 	pos->next = newnode;
 }
-//pos之后插入的话，就算pos指向第一个节点，也不用担心改变头节点了，因此不需要传二级指针了
-//甚至不需要传链表的头指针了
 
-
-
-// 单链表删除pos位置的值
-void SLErase(SLNode** pphead, SLNode* pos)
-{
-	assert(pphead);//头指针的地址不能为空要断言
-
-	if (*pphead == pos)
-	{
-		//pos指向第二个节点，涉及头删，传二级
-		SLPopFront(pphead);
-	}
-	else
-	{
-		//pos指向第三个及第三个节点之后的节点，无特殊情况
-		SLNode* prev = *pphead;
-		while (prev->next != pos)
-		{
-			prev = prev->next;
-		}
-		prev->next = pos->next;
-		free(pos);
-	}
-}
-//pos 出函数就销毁，没有置空的必要
 
 // 单链表删除pos位置之后的值
-void SLEraseAfter(SLNode* pos)
+// 分析思考为什么不删除pos位置？
+void SListEraseAfter(SListNode* pos)
 {
-	assert(pos->next);//当链表有一个节点时不适合再用这个功能
-	
-	SLNode* next = pos->next;
-	pos->next = next->next;
-	free(next);
+	/*
+	* pos位置之后删除只有有一种情况。
+	* 在pos前删除：涉及头删，参数+1，二级指针
+	*/
+	assert(pos);
+
+	SListNode* temp = pos->next;
+	pos->next = temp->next;
+	free(temp);
 }
 
-//清空链表 - 释放所有节点
-void SLDestory(SLNode** pphead)
+
+// 单链表的销毁
+void SListDestroy(SListNode* plist)
 {
-	assert(pphead);//头指针的地址不能为空要断言
+	assert(plist);
 
-	while (*pphead)
+	while (plist)
 	{
-		SLNode* tmp = *pphead;
-
-		*pphead = (*pphead)->next;
-
-		free(tmp);
+		SListNode* temp = plist;
+		plist = plist->next;
+		free(temp);
 	}
-	*pphead = NULL;
 }

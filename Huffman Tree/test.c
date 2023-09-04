@@ -157,33 +157,33 @@ int main(void)
 		printf(". ");
 		Sleep(1000);
 	}
-	system("cls");
+	//system("cls");
 	printf("要求二结果如下：\n");
 	function1();
 
 
 	Sleep(5000);
-	system("cls");
+	//system("cls");
 	printf("即将展示要求三");
 	for (int i = 0; i < 3; i++)
 	{
 		printf(". ");
 		Sleep(1000);
 	}
-	system("cls");
+	//system("cls");
 	printf("要求三结果如下：\n");
 	function2();
 
 
 	Sleep(5000);
-	system("cls");
+	//system("cls");
 	printf("即将展示要求四");
 	for (int i = 0; i < 3; i++)
 	{
 		printf(". ");
 		Sleep(1000);
 	}
-	system("cls");
+	//system("cls");
 	printf("要求四结果如下：\n");
 	function3();
 
